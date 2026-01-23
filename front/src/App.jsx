@@ -1,12 +1,12 @@
 import { Routes, Route } from 'react-router-dom'
-import Login from './Login'
-import Prueba from './pages/PaginaPrueba'
+import Login from './shared/components/Login'
+import Dashboard from './pages/Dashboard'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/prueba" element={<Prueba />} />
+      <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
   )
 }

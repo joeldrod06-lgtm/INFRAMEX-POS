@@ -145,7 +145,7 @@ export default function Login() {
 
     setTimeout(() => {
       setLoading(false);
-      navigate('/prueba');
+      navigate('/dashboard');
     }, 800);
   };
 
