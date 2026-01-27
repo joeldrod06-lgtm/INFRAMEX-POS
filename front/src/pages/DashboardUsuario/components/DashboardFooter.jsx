@@ -1,6 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { colorPalette } from '../utils/colors';
+import { Box, Typography, Link, Stack } from '@mui/material';
 
 const DashboardFooter = () => {
   return (
@@ -10,28 +9,80 @@ const DashboardFooter = () => {
         py: 2,
         px: 3,
         mt: 'auto',
-        bgcolor: colorPalette.background,
-        borderTop: `1px solid ${colorPalette.border}`
+        bgcolor: 'background.paper',
+        borderTop: '1px solid',
+        borderColor: 'divider'
       }}
     >
-      <Box sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center' 
-      }}>
+      <Stack 
+        direction={{ xs: 'column', sm: 'row' }} 
+        spacing={2}
+        justifyContent="space-between" 
+        alignItems="center"
+      >
         <Typography variant="body2" sx={{ 
-          color: colorPalette.textSecondary, 
-          fontSize: '0.85rem' 
+          color: 'text.secondary', 
+          fontSize: '0.85rem',
+          textAlign: { xs: 'center', sm: 'left' }
         }}>
-          © {new Date().getFullYear()} INFAMEX S.L.U. - Panel de Vendedor
+          © {new Date().getFullYear()} INFAMEX S.L.U. • Sistema de Punto de Venta
         </Typography>
+        
+        <Stack direction="row" spacing={3}>
+          <Link 
+            href="#" 
+            variant="body2" 
+            sx={{ 
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main',
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            Política de privacidad
+          </Link>
+          <Link 
+            href="#" 
+            variant="body2" 
+            sx={{ 
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main',
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            Términos de uso
+          </Link>
+          <Link 
+            href="#" 
+            variant="body2" 
+            sx={{ 
+              color: 'text.secondary',
+              fontSize: '0.85rem',
+              textDecoration: 'none',
+              '&:hover': {
+                color: 'primary.main',
+                textDecoration: 'underline'
+              }
+            }}
+          >
+            Soporte técnico
+          </Link>
+        </Stack>
+        
         <Typography variant="caption" sx={{ 
-          color: colorPalette.textSecondary,
+          color: 'text.disabled',
           fontSize: '0.75rem'
         }}>
-          Última actualización: Hoy, 10:30 AM
+          Versión 2.4.1 • Conectado
         </Typography>
-      </Box>
+      </Stack>
     </Box>
   );
 };

@@ -8,38 +8,42 @@ import {
   Stack,
   Chip,
   Avatar,
+  Badge,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
+  Person as PersonIcon,
 } from '@mui/icons-material';
-import { colorPalette } from '../utils/colors';
 
 const DashboardHeader = ({ 
   usuarioInfo, 
   isMobile, 
-  mobileOpen, 
   handleDrawerToggle 
 }) => {
   return (
     <AppBar
       position="sticky"
-      elevation={0}
+      elevation={1}
       sx={{
-        bgcolor: colorPalette.background,
-        borderBottom: `1px solid ${colorPalette.border}`,
-        color: colorPalette.textPrimary
+        bgcolor: 'white',
+        borderBottom: '1px solid',
+        borderColor: 'divider',
+        color: 'text.primary',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
       }}
     >
-      <Toolbar sx={{ minHeight: 64, px: { xs: 2, md: 3 } }}>
+      <Toolbar sx={{ 
+        minHeight: 70, 
+        px: { xs: 2, md: 3 } 
+      }}>
         {isMobile && (
           <IconButton 
-            color="inherit" 
             edge="start" 
             onClick={handleDrawerToggle} 
             sx={{ 
               mr: 2,
-              color: colorPalette.textSecondary
+              color: 'text.secondary'
             }}
           >
             <MenuIcon />
@@ -47,70 +51,92 @@ const DashboardHeader = ({
         )}
         
         <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" noWrap sx={{ 
+          <Typography variant="h6" sx={{ 
             fontWeight: 600, 
-            color: colorPalette.textPrimary,
+            color: 'text.primary',
             fontSize: { xs: '1rem', md: '1.25rem' }
           }}>
-            Dashboard
+            Panel de Control
+          </Typography>
+          <Typography variant="caption" sx={{ 
+            color: 'text.secondary',
+            fontSize: '0.75rem'
+          }}>
+            Dashboard principal • Sistema de Ventas
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={1.5} alignItems="center">
+        <Stack direction="row" spacing={2} alignItems="center">
           <Chip 
             label={usuarioInfo.sucursal}
             size="small"
             sx={{ 
-              bgcolor: colorPalette.primaryLightest, 
-              color: colorPalette.primary,
+              bgcolor: 'primary.50', 
+              color: 'primary.600',
               fontWeight: 500,
               fontSize: '0.75rem',
+              border: '1px solid',
+              borderColor: 'primary.100',
               display: { xs: 'none', sm: 'flex' }
             }}
           />
+          
           <IconButton 
-            size="medium" 
+            size="medium"
             sx={{ 
-              position: 'relative',
-              color: colorPalette.textSecondary,
+              color: 'text.secondary',
               '&:hover': {
-                bgcolor: colorPalette.hoverBg
+                bgcolor: 'action.hover'
               }
             }}
           >
-            <NotificationsIcon />
-            <Box
+            <Badge 
+              badgeContent={3} 
+              color="error"
               sx={{
-                position: 'absolute',
-                top: 8,
-                right: 8,
-                width: 8,
-                height: 8,
-                bgcolor: colorPalette.error,
-                borderRadius: '50%'
+                '& .MuiBadge-badge': {
+                  fontSize: '0.6rem',
+                  height: 16,
+                  minWidth: 16
+                }
               }}
-            />
+            >
+              <NotificationsIcon />
+            </Badge>
           </IconButton>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: 1.5,
+            p: 1,
+            borderRadius: 2,
+            '&:hover': {
+              bgcolor: 'action.hover'
+            }
+          }}>
             <Avatar sx={{ 
-              width: 36, 
-              height: 36, 
-              bgcolor: colorPalette.primary,
+              width: 38, 
+              height: 38, 
+              bgcolor: 'primary.600',
               fontWeight: 600,
               fontSize: '0.9rem'
             }}>
-              {usuarioInfo.nombre.charAt(0)}
+              <PersonIcon fontSize="small" />
             </Avatar>
-            <Box sx={{ display: { xs: 'none', sm: 'flex' }, flexDirection: 'column' }}>
+            <Box sx={{ 
+              display: { xs: 'none', sm: 'flex' }, 
+              flexDirection: 'column' 
+            }}>
               <Typography variant="body2" sx={{ 
                 fontWeight: 600, 
                 lineHeight: 1.2,
-                color: colorPalette.textPrimary
+                color: 'text.primary'
               }}>
                 {usuarioInfo.nombre}
               </Typography>
               <Typography variant="caption" sx={{ 
-                color: colorPalette.textSecondary, 
+                color: 'text.secondary', 
                 lineHeight: 1.2 
               }}>
                 {usuarioInfo.rol}

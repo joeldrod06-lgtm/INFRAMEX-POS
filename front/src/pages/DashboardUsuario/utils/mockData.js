@@ -1,15 +1,30 @@
 import {
-  TrendingUp,
+  People,
+  LocalShipping,
+  Assessment,
   AttachMoney,
+  TrendingUp,
   CreditCard,
   ShowChart,
+  ShoppingCart,
+  Inventory,
+  Receipt,
 } from '@mui/icons-material';
-import { colorPalette } from './colors';
+
+// Colores formales para dashboard profesional
+const COLORS = {
+  primary: '#1e40af',
+  secondary: '#374151',
+  success: '#059669',
+  warning: '#d97706',
+  error: '#dc2626',
+  info: '#0ea5e9',
+};
 
 export const usuarioInfo = {
   nombre: 'Joel Duran',
-  rol: 'Vendedor',
-  sucursal: 'Sucursal Centro',
+  rol: 'Gerente de Ventas',
+  sucursal: 'Centro Comercial',
   metaVentas: 85,
   pedidosPendientes: 5,
   clientesActivos: 24,
@@ -18,18 +33,18 @@ export const usuarioInfo = {
 };
 
 export const tareasUsuario = [
-  { id: 1, descripcion: 'Seguimiento a cliente ElectroCom', fecha: 'Hoy, 15:00', completada: false, prioridad: 'alta' },
-  { id: 2, descripcion: 'Actualizar inventario sección cables', fecha: 'Mañana', completada: false, prioridad: 'media' },
-  { id: 3, descripcion: 'Reporte de ventas semanal', fecha: 'Viernes', completada: true, prioridad: 'media' },
-  { id: 4, descripcion: 'Reunión de equipo comercial', fecha: '01/03, 10:00', completada: false, prioridad: 'alta' },
-  { id: 5, descripcion: 'Contactar nuevos prospectos', fecha: 'Esta semana', completada: false, prioridad: 'baja' },
+  { id: 1, descripcion: 'Revisión de inventario semanal', fecha: 'Hoy, 15:00', completada: false, prioridad: 'alta' },
+  { id: 2, descripcion: 'Reporte financiero mensual', fecha: 'Mañana, 10:00', completada: false, prioridad: 'media' },
+  { id: 3, descripcion: 'Capacitación nuevo personal', fecha: 'Viernes, 14:00', completada: true, prioridad: 'media' },
+  { id: 4, descripcion: 'Auditoría de caja', fecha: '01/03, 09:00', completada: false, prioridad: 'alta' },
+  { id: 5, descripcion: 'Actualización de precios', fecha: 'Esta semana', completada: false, prioridad: 'baja' },
 ];
 
 export const ventasCredito = [
-  { id: '#VC-001', cliente: 'ElectroCom S.A.', monto: '$12,500', fecha: '15/02/2024', plazo: '30 días', estado: 'Pendiente' },
-  { id: '#VC-002', cliente: 'Comercial MX', monto: '$8,700', fecha: '10/02/2024', plazo: '45 días', estado: 'Pendiente' },
-  { id: '#VC-003', cliente: 'TecnoSoluciones', monto: '$5,200', fecha: '05/02/2024', plazo: '60 días', estado: 'Pagado' },
-  { id: '#VC-004', cliente: 'Distribuidora Norte', monto: '$3,800', fecha: '28/01/2024', plazo: '30 días', estado: 'Pagado' },
+  { id: '#VC-001', cliente: 'Corporación XYZ S.A.', monto: '$12,500', fecha: '15/02/2024', plazo: '30 días', estado: 'Pendiente' },
+  { id: '#VC-002', cliente: 'Comercial Internacional', monto: '$8,700', fecha: '10/02/2024', plazo: '45 días', estado: 'Pendiente' },
+  { id: '#VC-003', cliente: 'Tecnología Avanzada', monto: '$5,200', fecha: '05/02/2024', plazo: '60 días', estado: 'Pagado' },
+  { id: '#VC-004', cliente: 'Distribuidora Nacional', monto: '$3,800', fecha: '28/01/2024', plazo: '30 días', estado: 'Pagado' },
 ];
 
 export const resumenComisiones = {
@@ -41,40 +56,71 @@ export const resumenComisiones = {
   comisionPendiente: '$1,785'
 };
 
+export const estadisticasRapidas = [
+  { 
+    value: '24', 
+    label: 'Clientes Activos', 
+    icon: <People />,
+    color: COLORS.primary,
+    bgColor: '#dbeafe',
+    trend: { value: '+12%', direction: 'up' }
+  },
+  { 
+    value: '5', 
+    label: 'Pedidos Pendientes', 
+    icon: <LocalShipping />,
+    color: COLORS.warning,
+    bgColor: '#fef3c7',
+    trend: { value: '-3%', direction: 'down' }
+  },
+  { 
+    value: '$185.4K', 
+    label: 'Ventas Mensuales', 
+    icon: <Assessment />,
+    color: COLORS.success,
+    bgColor: '#d1fae5',
+    trend: { value: '+8.5%', direction: 'up' }
+  },
+  { 
+    value: '85%', 
+    label: 'Meta de Ventas', 
+    icon: <TrendingUp />,
+    color: COLORS.info,
+    bgColor: '#e0f2fe',
+    trend: { value: '+5.2%', direction: 'up' }
+  }
+];
+
 export const kpis = [
   {
-    title: 'Progreso de Meta',
-    value: `${usuarioInfo.metaVentas}%`,
+    title: 'Ticket Promedio',
+    value: '$245.80',
+    icon: <Receipt />,
+    color: COLORS.primary,
+    progress: 78,
+    subtitle: 'Aumentó 12% este mes'
+  },
+  {
+    title: 'Conversión',
+    value: '42.5%',
     icon: <TrendingUp />,
-    color: colorPalette.primary,
-    bgColor: colorPalette.primaryLightest,
-    progress: usuarioInfo.metaVentas,
-    subtitle: `Ventas: ${resumenComisiones.ventasTotalesMes}`
+    color: COLORS.success,
+    progress: 42,
+    subtitle: 'Tasa de visitas a ventas'
   },
   {
-    title: 'Comisión Acumulada',
-    value: resumenComisiones.comisionCalculada,
+    title: 'Rotación',
+    value: '3.8x',
+    icon: <Inventory />,
+    color: COLORS.info,
+    subtitle: 'Inventario mensual'
+  },
+  {
+    title: 'Margen Neto',
+    value: '28.3%',
     icon: <AttachMoney />,
-    color: colorPalette.primary,
-    bgColor: colorPalette.primaryLightest,
-    subtitle: `${resumenComisiones.porcentajeComision} sobre ventas`,
-    trend: '+12.5%'
-  },
-  {
-    title: 'Ventas a Crédito',
-    value: resumenComisiones.ventasCreditoMes,
-    icon: <CreditCard />,
-    color: colorPalette.primary,
-    bgColor: colorPalette.primaryLightest,
-    subtitle: `${ventasCredito.filter(v => v.estado === 'Pendiente').length} pendientes`
-  },
-  {
-    title: 'Eficiencia',
-    value: '92%',
-    icon: <ShowChart />,
-    color: colorPalette.primary,
-    bgColor: colorPalette.primaryLightest,
-    subtitle: 'Tasa de conversión',
-    progress: 92
+    color: COLORS.warning,
+    progress: 28,
+    subtitle: 'Beneficio operativo'
   }
 ];
