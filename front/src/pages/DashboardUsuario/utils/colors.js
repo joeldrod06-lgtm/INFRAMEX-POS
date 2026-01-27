@@ -1,0 +1,18 @@
+export const colorPalette = {
+  primary: '#1e40af',
+  primaryLight: '#3b82f6',
+  primaryLighter: '#60a5fa',
+  primaryLightest: '#dbeafe',
+  secondary: '#374151',
+  secondaryLight: '#6b7280',
+  background: '#ffffff',
+  surface: '#f8fafc',
+  border: '#e5e7eb',
+  success: '#059669',
+  warning: '#d97706',
+  error: '#dc2626',
+  textPrimary: '#111827',
+  textSecondary: '#4b5563',
+  hoverBg: '#f1f5f9',
+  activeBg: '#eff6ff',
+};
