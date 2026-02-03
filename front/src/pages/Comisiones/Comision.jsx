@@ -18,6 +18,9 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
+  IconButton,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   AttachMoney,
@@ -27,6 +30,8 @@ import {
   Search,
   TrendingUp,
   TrendingDown,
+  FilterList,
+  Menu as MenuIcon,
 } from '@mui/icons-material';
 import Sidebar from '../../shared/components/SideBar';
 
@@ -119,22 +124,27 @@ const MetricCard = ({ title, value, subtitle, icon, trend }) => {
     <Paper
       elevation={0}
       sx={{
-        p: 2.5,
+        p: { xs: 1.5, sm: 2.5 },
         backgroundColor: 'white',
         borderRadius: '12px',
-        border: '1px solid #e5e7eb',
+        border: '1px solid #e2e8f0',
         height: '100%',
+        transition: 'all 0.2s ease',
+        '&:hover': {
+          borderColor: '#cbd5e1',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        },
       }}
     >
       <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-        <Box>
-          <Typography variant="caption" color="#6b7280" sx={{ mb: 0.5, display: 'block' }}>
+        <Box sx={{ flex: 1, mr: 1 }}>
+          <Typography variant="caption" color="#64748b" sx={{ mb: 0.5, display: 'block', fontWeight: 500 }}>
             {title}
           </Typography>
-          <Typography variant="h5" fontWeight={700} sx={{ color: '#111827', mb: 0.5 }}>
+          <Typography variant="h6" fontWeight={700} sx={{ color: '#0f172a', mb: 0.5, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
             {value}
           </Typography>
-          <Stack direction="row" alignItems="center" spacing={0.5}>
+          <Stack direction="row" alignItems="center" spacing={0.5} flexWrap="wrap">
             {trend && (
               <>
                 {trend.direction === 'up' ? (
@@ -144,20 +154,20 @@ const MetricCard = ({ title, value, subtitle, icon, trend }) => {
                 )}
                 <Typography variant="caption" sx={{ 
                   color: trend.direction === 'up' ? '#10b981' : '#ef4444',
-                  fontWeight: 500 
+                  fontWeight: 600 
                 }}>
                   {trend.value}
                 </Typography>
               </>
             )}
-            <Typography variant="caption" color="#6b7280">
+            <Typography variant="caption" color="#64748b" sx={{ fontWeight: 500 }}>
               {subtitle}
             </Typography>
           </Stack>
         </Box>
         <Box sx={{ 
           p: 1.5, 
-          backgroundColor: '#f8fafc',
+          backgroundColor: '#f1f5f9',
           borderRadius: '10px',
           display: 'flex',
           alignItems: 'center',
@@ -172,26 +182,98 @@ const MetricCard = ({ title, value, subtitle, icon, trend }) => {
 
 // Componente de tabla
 const TablaVentas = ({ ventas }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const getEstadoChip = (estado) => {
     const config = {
-      completada: { color: '#059669', bg: 'rgba(16, 185, 129, 0.1)' },
-      pendiente: { color: '#d97706', bg: 'rgba(245, 158, 11, 0.1)' },
+      completada: { color: '#059669', bg: '#dcfce7' },
+      pendiente: { color: '#d97706', bg: '#fef3c7' },
     };
     const cfg = config[estado] || config.pendiente;
     
     return (
       <Chip
-        label={estado.toUpperCase()}
+        label={isMobile ? estado.charAt(0).toUpperCase() : estado.toUpperCase()}
         size="small"
         sx={{
           backgroundColor: cfg.bg,
           color: cfg.color,
-          fontWeight: 500,
+          fontWeight: 600,
           fontSize: '0.7rem',
+          minWidth: isMobile ? '40px' : 'auto',
+          '& .MuiChip-label': {
+            px: isMobile ? 0.5 : 1,
+          }
         }}
       />
     );
   };
+
+  if (isMobile) {
+    return (
+      <Stack spacing={2}>
+        {ventas.map((venta) => (
+          <Paper
+            key={venta.id}
+            elevation={0}
+            sx={{
+              p: 2,
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              border: '1px solid #e2e8f0',
+            }}
+          >
+            <Stack spacing={1}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                  <Typography variant="caption" color="#64748b">
+                    {new Date(venta.fecha).toLocaleDateString('es-MX')}
+                  </Typography>
+                  <Typography variant="subtitle2" color="#0f172a" fontWeight={600}>
+                    {venta.cliente}
+                  </Typography>
+                </Box>
+                {getEstadoChip(venta.estado)}
+              </Box>
+              
+              <Typography variant="body2" color="#475569">
+                {venta.producto}
+              </Typography>
+              
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between',
+                pt: 1,
+                borderTop: '1px dashed #e2e8f0'
+              }}>
+                <Box>
+                  <Typography variant="caption" color="#64748b" display="block">
+                    Total
+                  </Typography>
+                  <Typography variant="body2" color="#0f172a" fontWeight={600}>
+                    ${venta.total.toLocaleString('es-MX')}
+                  </Typography>
+                </Box>
+                
+                <Box sx={{ textAlign: 'right' }}>
+                  <Typography variant="caption" color="#64748b" display="block">
+                    Comisión
+                  </Typography>
+                  <Typography variant="body2" color="#059669" fontWeight={600}>
+                    ${venta.comision.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                  </Typography>
+                  <Typography variant="caption" color="#64748b">
+                    ({venta.porcentaje}%)
+                  </Typography>
+                </Box>
+              </Box>
+            </Stack>
+          </Paper>
+        ))}
+      </Stack>
+    );
+  }
 
   return (
     <TableContainer 
@@ -199,19 +281,20 @@ const TablaVentas = ({ ventas }) => {
       elevation={0}
       sx={{
         borderRadius: '12px',
-        border: '1px solid #e5e7eb',
+        border: '1px solid #e2e8f0',
         backgroundColor: 'white',
+        overflow: 'hidden',
       }}
     >
       <Table>
         <TableHead>
-          <TableRow sx={{ backgroundColor: '#f9fafb' }}>
-            <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Fecha</TableCell>
-            <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Cliente</TableCell>
-            <TableCell sx={{ fontWeight: 600, color: '#374151' }}>Producto</TableCell>
-            <TableCell sx={{ fontWeight: 600, color: '#374151' }} align="right">Total</TableCell>
-            <TableCell sx={{ fontWeight: 600, color: '#374151' }} align="right">Comisión</TableCell>
-            <TableCell sx={{ fontWeight: 600, color: '#374151' }} align="center">Estado</TableCell>
+          <TableRow sx={{ backgroundColor: '#f8fafc' }}>
+            <TableCell sx={{ fontWeight: 600, color: '#334155', py: 2 }}>Fecha</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: '#334155', py: 2 }}>Cliente</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: '#334155', py: 2 }}>Producto</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: '#334155', py: 2 }} align="right">Total</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: '#334155', py: 2 }} align="right">Comisión</TableCell>
+            <TableCell sx={{ fontWeight: 600, color: '#334155', py: 2 }} align="center">Estado</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -219,38 +302,39 @@ const TablaVentas = ({ ventas }) => {
             <TableRow 
               key={venta.id}
               sx={{ 
-                '&:hover': { backgroundColor: '#f9fafb' },
+                '&:hover': { backgroundColor: '#f8fafc' },
+                transition: 'background-color 0.2s ease',
               }}
             >
-              <TableCell>
-                <Typography variant="body2" color="#111827">
+              <TableCell sx={{ py: 2 }}>
+                <Typography variant="body2" color="#0f172a">
                   {new Date(venta.fecha).toLocaleDateString('es-MX')}
                 </Typography>
               </TableCell>
-              <TableCell>
-                <Typography variant="body2" color="#111827" fontWeight={500}>
+              <TableCell sx={{ py: 2 }}>
+                <Typography variant="body2" color="#0f172a" fontWeight={500}>
                   {venta.cliente}
                 </Typography>
               </TableCell>
-              <TableCell>
-                <Typography variant="body2" color="#111827">
+              <TableCell sx={{ py: 2 }}>
+                <Typography variant="body2" color="#0f172a">
                   {venta.producto}
                 </Typography>
               </TableCell>
-              <TableCell align="right">
-                <Typography variant="body2" color="#111827" fontWeight={600}>
+              <TableCell align="right" sx={{ py: 2 }}>
+                <Typography variant="body2" color="#0f172a" fontWeight={600}>
                   ${venta.total.toLocaleString('es-MX')}
                 </Typography>
               </TableCell>
-              <TableCell align="right">
+              <TableCell align="right" sx={{ py: 2 }}>
                 <Typography variant="body2" color="#059669" fontWeight={600}>
                   ${venta.comision.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
                 </Typography>
-                <Typography variant="caption" color="#6b7280">
+                <Typography variant="caption" color="#64748b">
                   {venta.porcentaje}%
                 </Typography>
               </TableCell>
-              <TableCell align="center">
+              <TableCell align="center" sx={{ py: 2 }}>
                 {getEstadoChip(venta.estado)}
               </TableCell>
             </TableRow>
@@ -262,10 +346,15 @@ const TablaVentas = ({ ventas }) => {
 };
 
 export default function ModuloComisiones() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  
   const [ventas] = useState(ventasMock);
   const [resumen] = useState(resumenMes);
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [showFilters, setShowFilters] = useState(false);
 
   const ventasFiltradas = ventas.filter(venta => {
     if (filtroEstado !== 'todos' && venta.estado !== filtroEstado) {
@@ -283,72 +372,101 @@ export default function ModuloComisiones() {
     return true;
   });
 
+  const formatCurrency = (amount) => {
+    if (isMobile && amount >= 100000) {
+      return `$${(amount / 1000).toFixed(0)}k`;
+    }
+    return `$${amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+  };
+
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f9fafb' }}>
-      <Sidebar />
-      
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h5" fontWeight={700} color="#1e293b" gutterBottom>
-            <AttachMoney sx={{ mr: 1.5, verticalAlign: 'middle', color: '#10b981' }} />
-            Mis Comisiones
-          </Typography>
-        </Box>
+    <Sidebar>
+      {/* Header */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+          <Box>
+            <Typography variant="h5" fontWeight={700} color="#0f172a" gutterBottom>
+              <AttachMoney sx={{ 
+                mr: 1.5, 
+                verticalAlign: 'middle', 
+                color: '#10b981',
+                fontSize: { xs: '1.5rem', sm: '1.75rem' }
+              }} />
+              Mis Comisiones
+            </Typography>
+            <Typography variant="body2" color="#64748b">
+              Resumen de ventas y comisiones del mes actual
+            </Typography>
+          </Box>
+          
+          {isMobile && (
+            <IconButton
+              onClick={() => setShowFilters(!showFilters)}
+              sx={{
+                backgroundColor: '#f1f5f9',
+                '&:hover': { backgroundColor: '#e2e8f0' }
+              }}
+            >
+              <FilterList />
+            </IconButton>
+          )}
+        </Stack>
+      </Box>
 
-        {/* Métricas */}
-        <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid item xs={12} sm={6} lg={3}>
-            <MetricCard
-              title="Total Ventas"
-              value={`$${resumen.ventasTotales.toLocaleString('es-MX')}`}
-              subtitle="Este mes"
-              icon={<ShoppingCart sx={{ color: '#3b82f6' }} />}
-              trend={{ direction: 'up', value: '+12%' }}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} lg={3}>
-            <MetricCard
-              title="Comisión Total"
-              value={`$${resumen.comisionTotal.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}
-              subtitle="Acumulado"
-              icon={<AttachMoney sx={{ color: '#10b981' }} />}
-              trend={{ direction: 'up', value: '+8%' }}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} lg={3}>
-            <MetricCard
-              title="Por Pagar"
-              value={`$${resumen.comisionPorPagar.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`}
-              subtitle="Pendiente"
-              icon={<AccountBalance sx={{ color: '#f59e0b' }} />}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} lg={3}>
-            <MetricCard
-              title="Ventas"
-              value={`${resumen.ventasCompletadas}/${resumen.totalVentas}`}
-              subtitle="Completadas"
-              icon={<CheckCircle sx={{ color: '#8b5cf6' }} />}
-            />
-          </Grid>
+      {/* Métricas */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
+        <Grid item xs={6} sm={6} md={3}>
+          <MetricCard
+            title="Total Ventas"
+            value={formatCurrency(resumen.ventasTotales)}
+            subtitle="Este mes"
+            icon={<ShoppingCart sx={{ color: '#3b82f6', fontSize: { xs: 20, sm: 24 } }} />}
+            trend={{ direction: 'up', value: '+12%' }}
+          />
         </Grid>
+        
+        <Grid item xs={6} sm={6} md={3}>
+          <MetricCard
+            title="Comisión Total"
+            value={formatCurrency(resumen.comisionTotal)}
+            subtitle="Acumulado"
+            icon={<AttachMoney sx={{ color: '#10b981', fontSize: { xs: 20, sm: 24 } }} />}
+            trend={{ direction: 'up', value: '+8%' }}
+          />
+        </Grid>
+        
+        <Grid item xs={6} sm={6} md={3}>
+          <MetricCard
+            title="Por Pagar"
+            value={formatCurrency(resumen.comisionPorPagar)}
+            subtitle="Pendiente"
+            icon={<AccountBalance sx={{ color: '#f59e0b', fontSize: { xs: 20, sm: 24 } }} />}
+          />
+        </Grid>
+        
+        <Grid item xs={6} sm={6} md={3}>
+          <MetricCard
+            title="Ventas"
+            value={`${resumen.ventasCompletadas}/${resumen.totalVentas}`}
+            subtitle="Completadas"
+            icon={<CheckCircle sx={{ color: '#8b5cf6', fontSize: { xs: 20, sm: 24 } }} />}
+          />
+        </Grid>
+      </Grid>
 
-        {/* Filtros */}
+      {/* Filtros */}
+      {(showFilters || !isMobile) && (
         <Paper
           elevation={0}
           sx={{
-            p: 2,
+            p: { xs: 2, sm: 2.5 },
             mb: 3,
             backgroundColor: 'white',
-            borderRadius: '10px',
+            borderRadius: '12px',
             border: '1px solid #e2e8f0',
           }}
         >
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={isMobile ? 'stretch' : 'center'}>
             <TextField
               placeholder="Buscar cliente o producto..."
               value={busqueda}
@@ -364,7 +482,7 @@ export default function ModuloComisiones() {
               }}
             />
 
-            <FormControl size="small" sx={{ minWidth: 120 }}>
+            <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 140 } }}>
               <InputLabel>Estado</InputLabel>
               <Select
                 value={filtroEstado}
@@ -378,15 +496,31 @@ export default function ModuloComisiones() {
             </FormControl>
           </Stack>
         </Paper>
+      )}
 
-        {/* Tabla */}
-        <Box>
-          <Typography variant="subtitle2" color="#64748b" sx={{ mb: 2 }}>
+      {/* Tabla */}
+      <Box>
+        <Box sx={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          mb: 2 
+        }}>
+          <Typography variant="subtitle2" color="#64748b" fontWeight={500}>
             Mostrando {ventasFiltradas.length} ventas
           </Typography>
-          <TablaVentas ventas={ventasFiltradas} />
+          
+          {isMobile && (
+            <Chip
+              label={`${ventasFiltradas.length} items`}
+              size="small"
+              sx={{ backgroundColor: '#f1f5f9', color: '#64748b' }}
+            />
+          )}
         </Box>
+        
+        <TablaVentas ventas={ventasFiltradas} />
       </Box>
-    </Box>
+    </Sidebar>
   );
 }

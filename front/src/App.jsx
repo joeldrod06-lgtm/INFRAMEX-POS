@@ -7,6 +7,7 @@ import Comision from './pages/Comisiones/Comision';
 import Cliente from './pages/Clientes/Clientes'
 import Ventas from './pages/Ventas/Ventas'
 import POS from './pages/POS/PuntodeVenta';
+import { Configuration } from './pages/Configuration/Configuration';
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
       <Route path="/clientes" element={<Cliente />} />
       <Route path="/ventas" element={<Ventas />} />
       <Route path="/pos" element={<POS />} />
+      <Route path='/configuracion' element={<Configuration />} />
 
     </Routes>
   );

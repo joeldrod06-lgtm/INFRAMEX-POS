@@ -11,31 +11,22 @@ import {
   FormControl,
   InputLabel,
   MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Avatar,
-  LinearProgress,
-  Badge,
-  alpha,
   Stack,
+  useTheme,
+  useMediaQuery,
+  alpha,
 } from '@mui/material';
 import {
   Search,
+  FilterList,
   AttachMoney,
-  TrendingUp,
-  TrendingDown,
   Person,
-  CheckCircle,
   Store,
-  CalendarMonth,
-  LocalShipping,
-  Pending,
-  Cancel,
+  CheckCircle,
+  TrendingUp,
   Receipt,
+  CalendarMonth,
 } from '@mui/icons-material';
 import Sidebar from '../../shared/components/SideBar';
 
@@ -101,510 +92,278 @@ const ventasSistema = [
     productos: 4,
     comision: 1960,
   },
-  {
-    id: 6,
-    numero: 'VEN-006-2024',
-    cliente: 'Decoraciones Lux',
-    vendedor: 'Juan Pérez',
-    fecha: '2024-12-09',
-    total: 7600,
-    estado: 'completada',
-    categoria: 'Acabados',
-    productos: 3,
-    comision: 1140,
-  },
-  {
-    id: 7,
-    numero: 'VEN-007-2024',
-    cliente: 'Proyectos Urbanos',
-    vendedor: 'Roberto Sánchez',
-    fecha: '2024-12-08',
-    total: 12500,
-    estado: 'cancelada',
-    categoria: 'Construcción',
-    productos: 2,
-    comision: 0,
-  },
-  {
-    id: 8,
-    numero: 'VEN-008-2024',
-    cliente: 'Techos Modernos',
-    vendedor: 'María González',
-    fecha: '2024-12-07',
-    total: 34000,
-    estado: 'completada',
-    categoria: 'Construcción',
-    productos: 6,
-    comision: 5100,
-  },
 ];
 
 // Datos de vendedores
 const vendedoresEquipo = [
-  { id: 1, nombre: 'Juan Pérez', iniciales: 'JP', color: '#3b82f6', desempenio: 95, ventas: 3, total: 45100, comision: 4570 },
-  { id: 2, nombre: 'María González', iniciales: 'MG', color: '#8b5cf6', desempenio: 88, ventas: 2, total: 76500, comision: 11475 },
-  { id: 3, nombre: 'Carlos López', iniciales: 'CL', color: '#10b981', desempenio: 72, ventas: 1, total: 5550, comision: 832.5 },
-  { id: 4, nombre: 'Ana Martínez', iniciales: 'AM', color: '#f59e0b', desempenio: 65, ventas: 1, total: 19600, comision: 1960 },
-  { id: 5, nombre: 'Roberto Sánchez', iniciales: 'RS', color: '#ef4444', desempenio: 45, ventas: 1, total: 12500, comision: 0 },
+  { id: 1, nombre: 'Juan Pérez', iniciales: 'JP', color: '#3b82f6', ventas: 2, total: 37500 },
+  { id: 2, nombre: 'María González', iniciales: 'MG', color: '#8b5cf6', ventas: 1, total: 42500 },
+  { id: 3, nombre: 'Carlos López', iniciales: 'CL', color: '#10b981', ventas: 1, total: 5550 },
+  { id: 4, nombre: 'Ana Martínez', iniciales: 'AM', color: '#f59e0b', ventas: 1, total: 19600 },
 ];
 
-// Componente de tarjeta de métrica refinada
-const MetricCard = ({ title, value, subtitle, icon, color, trend }) => {
+// Componente de tarjeta de métrica simplificada
+const MetricCard = ({ title, value, subtitle, icon, color }) => {
   return (
     <Paper
       elevation={0}
       sx={{
         p: 2,
-        height: '100%',
-        minHeight: 110,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'grey.200',
         backgroundColor: 'white',
-        transition: 'all 0.2s ease',
-        '&:hover': {
-          boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
-          transform: 'translateY(-2px)',
-        }
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
+        height: '100%',
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
-        <Box sx={{ 
-          width: 36, 
-          height: 36, 
-          borderRadius: 1.5,
-          backgroundColor: alpha(color, 0.1),
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          {React.cloneElement(icon, { sx: { fontSize: 18, color } })}
-        </Box>
-        <Typography variant="caption" sx={{ 
-          color: 'grey.600',
-          fontWeight: 500,
-          fontSize: '0.75rem',
-          textTransform: 'uppercase',
-          letterSpacing: '0.05em',
-        }}>
-          {title}
-        </Typography>
-      </Box>
-      
-      <Box>
-        <Typography variant="h5" fontWeight={700} sx={{ 
-          color: 'grey.900', 
-          mb: 0.5,
-          fontSize: '1.5rem',
-          lineHeight: 1.2,
-        }}>
-          {value}
-        </Typography>
-        
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="caption" sx={{ 
-            color: 'grey.600', 
-            fontSize: '0.75rem',
-          }}>
+      <Stack direction="row" alignItems="flex-start" justifyContent="space-between">
+        <Box>
+          <Typography variant="caption" color="#64748b" sx={{ mb: 0.5, display: 'block', fontWeight: 500 }}>
+            {title}
+          </Typography>
+          <Typography variant="h6" fontWeight={600} sx={{ color: '#0f172a', mb: 0.5 }}>
+            {value}
+          </Typography>
+          <Typography variant="caption" color="#64748b">
             {subtitle}
           </Typography>
-          {trend && (
-            <Chip
-              label={trend.value}
-              size="small"
-              sx={{
-                backgroundColor: trend.direction === 'up' ? 
-                  alpha('#10b981', 0.1) : 
-                  alpha('#ef4444', 0.1),
-                color: trend.direction === 'up' ? '#059669' : '#dc2626',
-                fontWeight: 600,
-                fontSize: '0.7rem',
-                height: 20,
-                '& .MuiChip-icon': {
-                  fontSize: 14,
-                  margin: '0 2px 0 4px',
-                }
-              }}
-              icon={trend.direction === 'up' ? 
-                <TrendingUp fontSize="inherit" /> : 
-                <TrendingDown fontSize="inherit" />
-              }
-            />
-          )}
         </Box>
-      </Box>
+        <Box sx={{ 
+          p: 1, 
+          backgroundColor: '#f1f5f9',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          {icon}
+        </Box>
+      </Stack>
     </Paper>
   );
 };
 
-// Componente de desempeño del equipo compacto
-const DesempenioEquipo = ({ vendedores }) => {
-  const totalVentas = vendedores.reduce((sum, v) => sum + v.ventas, 0);
-  const totalMonto = vendedores.reduce((sum, v) => sum + v.total, 0);
+// Componente de tarjeta de venta simplificada
+const VentaCard = ({ venta }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const getEstadoColor = (estado) => {
+    switch(estado) {
+      case 'completada': return '#10b981';
+      case 'pendiente': return '#f59e0b';
+      case 'enviada': return '#3b82f6';
+      default: return '#64748b';
+    }
+  };
+
+  const getVendedorColor = (nombre) => {
+    const vendedor = vendedoresEquipo.find(v => v.nombre === nombre);
+    return vendedor ? vendedor.color : '#64748b';
+  };
+
+  const vendedorColor = getVendedorColor(venta.vendedor);
 
   return (
     <Paper
       elevation={0}
       sx={{
         p: 2,
-        height: '100%',
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'grey.200',
         backgroundColor: 'white',
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
+        '&:hover': {
+          borderColor: '#3b82f6',
+        },
       }}
     >
-      <Box sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        mb: 2,
-      }}>
-        <Box>
-          <Typography variant="subtitle2" fontWeight={600} sx={{ color: 'grey.900', mb: 0.25 }}>
-            Desempeño del Equipo
-          </Typography>
-          <Typography variant="caption" sx={{ color: 'grey.600' }}>
-            Resumen por vendedor
-          </Typography>
-        </Box>
-        <Badge 
-          badgeContent={totalVentas} 
-          color="primary" 
-          sx={{
-            '& .MuiBadge-badge': {
-              fontSize: '0.7rem',
-              height: 20,
-              minWidth: 20,
-            }
-          }}
-        />
-      </Box>
-      
-      <Stack spacing={1.5}>
-        {vendedores.map((vendedor) => (
-          <Box 
-            key={vendedor.id}
-            sx={{ 
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1.5,
-              p: 1,
-              borderRadius: 1,
-              backgroundColor: 'grey.50',
-              border: '1px solid',
-              borderColor: 'grey.200',
-              '&:hover': {
-                backgroundColor: 'grey.100',
-              }
-            }}
-          >
-            <Avatar 
-              sx={{ 
-                width: 32, 
-                height: 32, 
-                fontSize: '0.75rem', 
-                bgcolor: vendedor.color,
-                fontWeight: 600,
-              }}
-            >
-              {vendedor.iniciales}
-            </Avatar>
-            
-            <Box sx={{ flex: 1, minWidth: 0 }}>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                mb: 0.5,
-              }}>
-                <Typography variant="body2" fontWeight={500} sx={{ color: 'grey.900' }}>
-                  {vendedor.nombre}
-                </Typography>
-                <Typography variant="caption" sx={{ 
-                  color: vendedor.color,
-                  fontWeight: 600,
-                  fontSize: '0.7rem',
-                  backgroundColor: alpha(vendedor.color, 0.1),
-                  px: 1,
-                  py: 0.25,
-                  borderRadius: 1,
-                }}>
-                  {vendedor.desempenio}%
-                </Typography>
-              </Box>
-              
-              <LinearProgress
-                variant="determinate"
-                value={vendedor.desempenio}
-                sx={{
-                  height: 4,
-                  borderRadius: 2,
-                  backgroundColor: 'grey.200',
-                  mb: 0.5,
-                  '& .MuiLinearProgress-bar': {
-                    borderRadius: 2,
-                    backgroundColor: vendedor.color,
-                  }
-                }}
-              />
-              
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: 1,
-              }}>
-                <Typography variant="caption" sx={{ color: 'grey.600' }}>
-                  {vendedor.ventas} ventas • ${vendedor.total.toLocaleString('es-MX')}
-                </Typography>
-                {vendedor.comision > 0 && (
-                  <Typography variant="caption" sx={{ 
-                    color: '#059669',
-                    fontWeight: 600,
-                    fontSize: '0.7rem',
-                  }}>
-                    +${vendedor.comision.toLocaleString('es-MX')}
-                  </Typography>
-                )}
-              </Box>
-            </Box>
+      <Stack spacing={2}>
+        {/* Header */}
+        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+          <Box>
+            <Typography variant="subtitle2" fontWeight={600} color="#0f172a" gutterBottom>
+              {venta.numero}
+            </Typography>
+            <Typography variant="body2" color="#475569">
+              {venta.cliente}
+            </Typography>
           </Box>
-        ))}
+          
+          <Chip
+            label={venta.estado}
+            size="small"
+            sx={{
+              backgroundColor: `${getEstadoColor(venta.estado)}20`,
+              color: getEstadoColor(venta.estado),
+              fontSize: '0.7rem',
+            }}
+          />
+        </Stack>
+
+        {/* Información de la venta */}
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <Avatar sx={{ 
+              width: 28, 
+              height: 28, 
+              fontSize: '0.75rem', 
+              bgcolor: vendedorColor,
+              fontWeight: 600,
+            }}>
+              {venta.vendedor.split(' ').map(n => n[0]).join('')}
+            </Avatar>
+            <Typography variant="caption" color="#475569">
+              {venta.vendedor}
+            </Typography>
+          </Stack>
+          
+          <Stack direction="row" alignItems="center" spacing={0.5}>
+            <CalendarMonth sx={{ fontSize: 14, color: '#64748b' }} />
+            <Typography variant="caption" color="#475569">
+              {new Date(venta.fecha).toLocaleDateString('es-MX', { 
+                day: '2-digit',
+                month: 'short'
+              })}
+            </Typography>
+          </Stack>
+        </Stack>
+
+        {/* Total y comisión */}
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Box>
+            <Typography variant="caption" color="#64748b" display="block">
+              Total
+            </Typography>
+            <Typography variant="body2" fontWeight={600} color="#0f172a">
+              ${venta.total.toLocaleString('es-MX')}
+            </Typography>
+          </Box>
+          
+          {venta.comision > 0 && (
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="caption" color="#64748b" display="block">
+                Comisión
+              </Typography>
+              <Typography variant="body2" fontWeight={600} color="#10b981">
+                ${venta.comision.toLocaleString('es-MX')}
+              </Typography>
+            </Box>
+          )}
+        </Stack>
       </Stack>
-      
-      <Box sx={{ 
-        mt: 2, 
-        pt: 1.5, 
-        borderTop: '1px solid',
-        borderColor: 'grey.200',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        <Typography variant="caption" sx={{ color: 'grey.600', fontWeight: 500 }}>
-          Total equipo
-        </Typography>
-        <Typography variant="body2" sx={{ 
-          color: 'grey.900',
-          fontWeight: 700,
-        }}>
-          ${totalMonto.toLocaleString('es-MX')}
-        </Typography>
-      </Box>
     </Paper>
   );
 };
 
-// Componente de tabla de ventas compacta
-const TablaVentas = ({ ventas }) => {
-  const getEstadoConfig = (estado) => {
-    const config = {
-      completada: { 
-        color: '#059669', 
-        bg: alpha('#10b981', 0.1), 
-        icon: <CheckCircle fontSize="small" />,
-      },
-      pendiente: { 
-        color: '#d97706', 
-        bg: alpha('#f59e0b', 0.1), 
-        icon: <Pending fontSize="small" />,
-      },
-      enviada: { 
-        color: '#3b82f6', 
-        bg: alpha('#3b82f6', 0.1), 
-        icon: <LocalShipping fontSize="small" />,
-      },
-      cancelada: { 
-        color: '#ef4444', 
-        bg: alpha('#ef4444', 0.1), 
-        icon: <Cancel fontSize="small" />,
-      },
-    };
-    return config[estado] || config.pendiente;
-  };
+// Componente de panel lateral derecho fijo
+const PanelDerechoEquipo = ({ vendedores }) => {
+  const totalVentas = vendedores.reduce((sum, v) => sum + v.total, 0);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
-  const getAvatarVendedor = (nombreVendedor) => {
-    const vendedor = vendedoresEquipo.find(v => v.nombre === nombreVendedor);
-    if (!vendedor) return null;
-    
-    return (
-      <Avatar sx={{ 
-        width: 28, 
-        height: 28, 
-        fontSize: '0.75rem', 
-        bgcolor: vendedor.color,
-        fontWeight: 600,
-      }}>
-        {vendedor.iniciales}
-      </Avatar>
-    );
-  };
+  if (isMobile) {
+    return null; // Ocultar panel en móviles y tablets
+  }
 
   return (
-    <TableContainer 
-      component={Paper}
-      elevation={0}
+    <Box
       sx={{
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: 'grey.200',
-        backgroundColor: 'white',
+        width: '280px',
+        flexShrink: 0,
+        position: 'sticky',
+        top: 0,
+        height: 'calc(100vh - 64px)',
+        overflowY: 'auto',
+        '&::-webkit-scrollbar': {
+          width: 4,
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: alpha('#000', 0.1),
+          borderRadius: 2,
+        },
       }}
     >
-      <Table size="small">
-        <TableHead>
-          <TableRow sx={{ 
-            backgroundColor: 'grey.50',
-            '& th': {
-              borderBottom: '2px solid',
-              borderColor: 'grey.200',
-              py: 1,
-              px: 2,
-              fontWeight: 600,
-              color: 'grey.700',
-              fontSize: '0.75rem',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }
-          }}>
-            <TableCell>VENTA</TableCell>
-            <TableCell>CLIENTE</TableCell>
-            <TableCell>VENDEDOR</TableCell>
-            <TableCell>FECHA</TableCell>
-            <TableCell align="right">TOTAL</TableCell>
-            <TableCell align="center">ESTADO</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {ventas.map((venta) => {
-            const estado = getEstadoConfig(venta.estado);
-            return (
-              <TableRow 
-                key={venta.id}
-                sx={{ 
-                  '&:hover': { 
-                    backgroundColor: 'grey.50',
-                  },
-                  '& td': {
-                    py: 1.5,
-                    px: 2,
-                    borderBottom: '1px solid',
-                    borderColor: 'grey.100',
-                  }
-                }}
-              >
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                    <Box sx={{ 
-                      width: 28, 
-                      height: 28, 
-                      borderRadius: 1,
-                      backgroundColor: 'grey.100',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      <Receipt sx={{ fontSize: 14, color: 'grey.600' }} />
-                    </Box>
-                    <Box>
-                      <Typography variant="body2" fontWeight={600} sx={{ color: 'grey.900', fontSize: '0.875rem' }}>
-                        {venta.numero}
-                      </Typography>
-                      <Typography variant="caption" sx={{ color: 'grey.600', fontSize: '0.75rem' }}>
-                        {venta.productos} {venta.productos === 1 ? 'producto' : 'productos'}
-                      </Typography>
-                    </Box>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box>
-                    <Typography variant="body2" fontWeight={500} sx={{ color: 'grey.900', fontSize: '0.875rem' }}>
-                      {venta.cliente}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'grey.600', fontSize: '0.75rem' }}>
-                      {venta.categoria}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {getAvatarVendedor(venta.vendedor)}
-                    <Typography variant="body2" sx={{ color: 'grey.900', fontSize: '0.875rem' }}>
-                      {venta.vendedor}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <CalendarMonth sx={{ fontSize: 14, color: 'grey.600' }} />
-                    <Typography variant="body2" sx={{ color: 'grey.900', fontSize: '0.875rem' }}>
-                      {new Date(venta.fecha).toLocaleDateString('es-MX', { 
-                        day: '2-digit',
-                        month: 'short'
-                      })}
-                    </Typography>
-                  </Box>
-                </TableCell>
-                <TableCell align="right">
-                  <Box>
-                    <Typography variant="body2" fontWeight={700} sx={{ color: 'grey.900', fontSize: '0.875rem' }}>
-                      ${venta.total.toLocaleString('es-MX')}
-                    </Typography>
-                    {venta.comision > 0 && (
-                      <Typography variant="caption" sx={{ color: '#059669', fontWeight: 500, fontSize: '0.75rem' }}>
-                        +${venta.comision.toLocaleString('es-MX')}
-                      </Typography>
-                    )}
-                  </Box>
-                </TableCell>
-                <TableCell align="center">
-                  <Chip
-                    label={venta.estado.toUpperCase()}
-                    size="small"
-                    icon={estado.icon}
-                    sx={{
-                      backgroundColor: estado.bg,
-                      color: estado.color,
-                      fontWeight: 600,
-                      fontSize: '0.7rem',
-                      height: 24,
-                      px: 1,
-                      '& .MuiChip-icon': {
-                        fontSize: 14,
-                        color: estado.color,
-                      }
-                    }}
-                  />
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <Paper
+        elevation={0}
+        sx={{
+          p: 2.5,
+          backgroundColor: 'white',
+          borderRadius: '12px',
+          border: '1px solid #e2e8f0',
+          height: '100%',
+        }}
+      >
+        <Typography variant="h6" fontWeight={600} color="#0f172a" gutterBottom>
+          Desempeño del equipo
+        </Typography>
+        
+        <Stack spacing={2} sx={{ mt: 3 }}>
+          {vendedores.map((vendedor) => (
+            <Box key={vendedor.id}>
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                <Avatar sx={{ 
+                  width: 36, 
+                  height: 36, 
+                  fontSize: '0.875rem', 
+                  bgcolor: vendedor.color,
+                  fontWeight: 600,
+                }}>
+                  {vendedor.iniciales}
+                </Avatar>
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle2" fontWeight={600} color="#0f172a">
+                    {vendedor.nombre}
+                  </Typography>
+                  <Typography variant="caption" color="#64748b">
+                    {vendedor.ventas} ventas
+                  </Typography>
+                </Box>
+              </Stack>
+              
+              <Box sx={{ ml: 5.5, mt: 0.5 }}>
+                <Typography variant="body2" fontWeight={600} color="#0f172a">
+                  ${vendedor.total.toLocaleString('es-MX')}
+                </Typography>
+              </Box>
+            </Box>
+          ))}
+        </Stack>
+        
+        <Box sx={{ 
+          mt: 4, 
+          pt: 2.5, 
+          borderTop: '1px solid #e2e8f0',
+        }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="subtitle2" fontWeight={600} color="#0f172a">
+              Total equipo
+            </Typography>
+            <Typography variant="h6" fontWeight={700} color="#0f172a">
+              ${totalVentas.toLocaleString('es-MX')}
+            </Typography>
+          </Stack>
+        </Box>
+      </Paper>
+    </Box>
   );
 };
 
 export default function DashboardVentas() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
+  
   const [ventas] = useState(ventasSistema);
   const [busqueda, setBusqueda] = useState('');
   const [filtroVendedor, setFiltroVendedor] = useState('todos');
   const [filtroEstado, setFiltroEstado] = useState('todos');
+  const [showFilters, setShowFilters] = useState(false);
 
   // Cálculo de métricas
   const totalVentas = ventas.reduce((sum, v) => sum + v.total, 0);
   const ventasCompletadas = ventas.filter(v => v.estado === 'completada').length;
-  const promedioVenta = totalVentas / ventas.length;
   const vendedorActual = 'Juan Pérez';
   const ventasVendedorActual = ventas.filter(v => v.vendedor === vendedorActual);
   const totalVendedorActual = ventasVendedorActual.reduce((sum, v) => sum + v.total, 0);
-  const ventasHoy = ventas.filter(v => 
-    new Date(v.fecha).toDateString() === new Date().toDateString()
-  ).length;
 
   const ventasFiltradas = ventas.filter(venta => {
     if (filtroVendedor !== 'todos' && venta.vendedor !== filtroVendedor) {
@@ -626,124 +385,105 @@ export default function DashboardVentas() {
     return true;
   });
 
-  return (
-    <Box sx={{ 
-      display: 'flex',
-      minHeight: '100vh',
-      backgroundColor: 'grey.50',
-    }}>
-      <Sidebar />
-      
-      <Box 
-        component="main" 
-        sx={{ 
-          flexGrow: 1,
-          p: 3,
-          ml: { md: 0 },
-          width: { md: `calc(100% - 260px)` },
-        }}
-      >
-        {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'space-between',
-            mb: 2 
-          }}>
-            <Box>
-              <Typography variant="h5" fontWeight={700} sx={{ 
-                color: 'grey.900',
-                mb: 0.5,
-              }}>
-                <Store sx={{ mr: 1.5, verticalAlign: 'middle', color: '#8b5cf6' }} />
-                Ventas del Sistema
-              </Typography>
-              <Typography variant="body2" sx={{ color: 'grey.600' }}>
-                Panorama completo de todas las transacciones comerciales
-              </Typography>
-            </Box>
+  const formatCurrency = (amount) => {
+    if (isMobile && amount >= 100000) {
+      return `$${(amount / 1000).toFixed(0)}k`;
+    }
+    return `$${amount.toLocaleString('es-MX')}`;
+  };
 
-            <Chip
-              label={`Hoy: ${ventasHoy}`}
-              size="small"
-              sx={{
-                backgroundColor: alpha('#3b82f6', 0.1),
-                color: '#3b82f6',
-                fontWeight: 600,
-                fontSize: '0.75rem',
-                height: 26,
-              }}
-            />
+  return (
+    <Sidebar>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: 3,
+        minHeight: 'calc(100vh - 64px)',
+      }}>
+        {/* Contenido principal - ocupa el espacio restante */}
+        <Box sx={{ 
+          flex: 1,
+          minWidth: 0, // Previene desbordamiento
+        }}>
+          {/* Header */}
+          <Box sx={{ mb: 3 }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+              <Box>
+                <Typography variant="h5" fontWeight={600} color="#0f172a" gutterBottom>
+                  <Store sx={{ 
+                    mr: 1.5, 
+                    verticalAlign: 'middle', 
+                    color: '#8b5cf6',
+                    fontSize: '1.5rem'
+                  }} />
+                  Ventas del Sistema
+                </Typography>
+                <Typography variant="body2" color="#64748b">
+                  Resumen de todas las transacciones
+                </Typography>
+              </Box>
+              
+              {isMobile && (
+                <Chip
+                  label={`${ventas.length} ventas`}
+                  size="small"
+                  sx={{ backgroundColor: '#f1f5f9', color: '#64748b' }}
+                />
+              )}
+            </Stack>
+
+            {/* Métricas */}
+            <Grid container spacing={2} sx={{ mt: 2 }}>
+              <Grid item xs={6} md={3}>
+                <MetricCard
+                  title="Total Ventas"
+                  value={formatCurrency(totalVentas)}
+                  subtitle="Acumulado"
+                  icon={<AttachMoney sx={{ color: '#3b82f6' }} />}
+                />
+              </Grid>
+              
+              <Grid item xs={6} md={3}>
+                <MetricCard
+                  title="Mis Ventas"
+                  value={formatCurrency(totalVendedorActual)}
+                  subtitle="Mi contribución"
+                  icon={<Person sx={{ color: '#10b981' }} />}
+                />
+              </Grid>
+              
+              <Grid item xs={6} md={3}>
+                <MetricCard
+                  title="Completadas"
+                  value={`${ventasCompletadas}`}
+                  subtitle="Ventas finalizadas"
+                  icon={<CheckCircle sx={{ color: '#f59e0b' }} />}
+                />
+              </Grid>
+              
+              <Grid item xs={6} md={3}>
+                <MetricCard
+                  title="Promedio"
+                  value={formatCurrency(totalVentas / ventas.length)}
+                  subtitle="Por venta"
+                  icon={<TrendingUp sx={{ color: '#8b5cf6' }} />}
+                />
+              </Grid>
+            </Grid>
           </Box>
 
-          {/* Métricas principales */}
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6} lg={3}>
-              <MetricCard
-                title="TOTAL VENTAS"
-                value={`$${totalVentas.toLocaleString('es-MX')}`}
-                subtitle="Acumulado del mes"
-                icon={<AttachMoney />}
-                color="#3b82f6"
-                trend={{ direction: 'up', value: '+15%' }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6} lg={3}>
-              <MetricCard
-                title="MIS VENTAS"
-                value={`$${totalVendedorActual.toLocaleString('es-MX')}`}
-                subtitle="Mi contribución"
-                icon={<Person />}
-                color="#10b981"
-                trend={{ direction: 'up', value: '+8%' }}
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6} lg={3}>
-              <MetricCard
-                title="EFECTIVIDAD"
-                value={`${Math.round((ventasCompletadas / ventas.length) * 100)}%`}
-                subtitle="Ventas completadas"
-                icon={<CheckCircle />}
-                color="#f59e0b"
-              />
-            </Grid>
-            
-            <Grid item xs={12} sm={6} lg={3}>
-              <MetricCard
-                title="PROMEDIO"
-                value={`$${promedioVenta.toLocaleString('es-MX', { minimumFractionDigits: 0 })}`}
-                subtitle="Por transacción"
-                icon={<TrendingUp />}
-                color="#8b5cf6"
-              />
-            </Grid>
-          </Grid>
-        </Box>
-
-        {/* Contenido principal */}
-        <Grid container spacing={3}>
-          <Grid item xs={12} lg={8}>
-            {/* Filtros */}
+          {/* Filtros */}
+          {(showFilters || !isMobile) && (
             <Paper
               elevation={0}
               sx={{
                 p: 2,
-                mb: 2,
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: 'grey.200',
+                mb: 3,
                 backgroundColor: 'white',
+                borderRadius: '10px',
+                border: '1px solid #e2e8f0',
               }}
             >
-              <Box sx={{ 
-                display: 'flex', 
-                flexDirection: { xs: 'column', md: 'row' },
-                alignItems: 'center',
-                gap: 2 
-              }}>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
                 <TextField
                   fullWidth
                   placeholder="Buscar ventas..."
@@ -752,31 +492,25 @@ export default function DashboardVentas() {
                   size="small"
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      borderRadius: 1,
-                      backgroundColor: 'grey.50',
+                      borderRadius: '8px',
                     },
                   }}
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Search sx={{ fontSize: 20, color: 'grey.500' }} />
+                        <Search sx={{ color: '#94a3b8' }} />
                       </InputAdornment>
                     ),
                   }}
                 />
 
-                <Box sx={{ 
-                  display: 'flex', 
-                  gap: 1, 
-                  width: { md: 'auto', xs: '100%' } 
-                }}>
-                  <FormControl size="small" sx={{ flex: 1, minWidth: 140 }}>
+                <Stack direction="row" spacing={1} sx={{ width: { xs: '100%', sm: 'auto' } }}>
+                  <FormControl size="small" sx={{ flex: 1 }}>
                     <InputLabel>Vendedor</InputLabel>
                     <Select
                       value={filtroVendedor}
                       label="Vendedor"
                       onChange={(e) => setFiltroVendedor(e.target.value)}
-                      sx={{ borderRadius: 1 }}
                     >
                       <MenuItem value="todos">Todos</MenuItem>
                       {vendedoresEquipo.map(v => (
@@ -785,50 +519,85 @@ export default function DashboardVentas() {
                     </Select>
                   </FormControl>
 
-                  <FormControl size="small" sx={{ flex: 1, minWidth: 120 }}>
+                  <FormControl size="small" sx={{ flex: 1 }}>
                     <InputLabel>Estado</InputLabel>
                     <Select
                       value={filtroEstado}
                       label="Estado"
                       onChange={(e) => setFiltroEstado(e.target.value)}
-                      sx={{ borderRadius: 1 }}
                     >
                       <MenuItem value="todos">Todos</MenuItem>
                       <MenuItem value="completada">Completada</MenuItem>
                       <MenuItem value="pendiente">Pendiente</MenuItem>
                       <MenuItem value="enviada">Enviada</MenuItem>
-                      <MenuItem value="cancelada">Cancelada</MenuItem>
                     </Select>
                   </FormControl>
-                </Box>
-              </Box>
+                </Stack>
+              </Stack>
             </Paper>
+          )}
 
-            {/* Tabla de ventas */}
-            <Box>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'space-between',
-                mb: 1.5,
-              }}>
-                <Typography variant="subtitle1" fontWeight={600} sx={{ color: 'grey.900' }}>
-                  Historial de Ventas
-                </Typography>
-                <Typography variant="caption" sx={{ color: 'grey.600' }}>
-                  {ventasFiltradas.length} ventas encontradas
-                </Typography>
-              </Box>
-              <TablaVentas ventas={ventasFiltradas} />
-            </Box>
-          </Grid>
+          {/* Ventas recientes */}
+          <Box>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+              <Typography variant="subtitle1" fontWeight={600} color="#0f172a">
+                Ventas recientes
+              </Typography>
+              
+              <Stack direction="row" alignItems="center" spacing={1}>
+                {isTablet && (
+                  <Chip
+                    label={`${ventasFiltradas.length} items`}
+                    size="small"
+                    sx={{ backgroundColor: '#f1f5f9', color: '#64748b', fontSize: '0.7rem' }}
+                  />
+                )}
+                {isMobile && (
+                  <IconButton
+                    onClick={() => setShowFilters(!showFilters)}
+                    size="small"
+                    sx={{
+                      backgroundColor: '#f1f5f9',
+                      '&:hover': { backgroundColor: '#e2e8f0' }
+                    }}
+                  >
+                    <FilterList fontSize="small" />
+                  </IconButton>
+                )}
+              </Stack>
+            </Stack>
 
-          <Grid item xs={12} lg={4}>
-            {/* Panel de desempeño del equipo */}
-            <DesempenioEquipo vendedores={vendedoresEquipo} />
-          </Grid>
-        </Grid>
+            {ventasFiltradas.length > 0 ? (
+              <Stack spacing={2}>
+                {ventasFiltradas.map((venta) => (
+                  <VentaCard key={venta.id} venta={venta} />
+                ))}
+              </Stack>
+            ) : (
+              <Paper
+                sx={{
+                  p: 4,
+                  textAlign: 'center',
+                  backgroundColor: 'white',
+                  borderRadius: '10px',
+                  border: '1px solid #e2e8f0',
+                }}
+              >
+                <Receipt sx={{ fontSize: 40, color: '#cbd5e1', mb: 1 }} />
+                <Typography variant="body1" color="#475569" gutterBottom>
+                  No se encontraron ventas
+                </Typography>
+                <Typography variant="body2" color="#94a3b8">
+                  {busqueda ? 'Intenta con otros términos de búsqueda' : 'No hay ventas registradas'}
+                </Typography>
+              </Paper>
+            )}
+          </Box>
+        </Box>
+
+        {/* Panel lateral derecho - solo visible en escritorio */}
+        <PanelDerechoEquipo vendedores={vendedoresEquipo} />
       </Box>
-    </Box>
+    </Sidebar>
   );
 }

@@ -12,12 +12,9 @@ import {
   Button,
   TextField,
   InputAdornment,
-  Menu,
-  MenuItem,
-  ListItemIcon,
   Avatar,
-  Badge,
-  Divider,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Search,
@@ -27,18 +24,9 @@ import {
   Email,
   LocationOn,
   CalendarMonth,
-  TrendingUp,
-  ShoppingCart,
   AttachMoney,
-  MoreVert,
   Add,
-  Chat,
-  Receipt,
-  Assignment,
   Star,
-  StarBorder,
-  AccessTime,
-  CheckCircle,
 } from '@mui/icons-material';
 import Sidebar from '../../shared/components/SideBar';
 
@@ -55,9 +43,7 @@ const clientesMock = [
     totalCompras: 1250000,
     estado: 'activo',
     prioridad: 'alta',
-    comprasUltimoMes: 3,
     calificacion: 4.8,
-    etiquetas: ['corporativo', 'frecuente', 'preferente'],
   },
   {
     id: 2,
@@ -70,9 +56,7 @@ const clientesMock = [
     totalCompras: 850000,
     estado: 'activo',
     prioridad: 'media',
-    comprasUltimoMes: 2,
     calificacion: 4.5,
-    etiquetas: ['eléctrico', 'frecuente'],
   },
   {
     id: 3,
@@ -85,9 +69,7 @@ const clientesMock = [
     totalCompras: 420000,
     estado: 'pendiente',
     prioridad: 'alta',
-    comprasUltimoMes: 1,
     calificacion: 4.2,
-    etiquetas: ['arquitectura', 'nuevo'],
   },
   {
     id: 4,
@@ -100,9 +82,7 @@ const clientesMock = [
     totalCompras: 185000,
     estado: 'activo',
     prioridad: 'baja',
-    comprasUltimoMes: 1,
     calificacion: 4.0,
-    etiquetas: ['hogar', 'residencial'],
   },
   {
     id: 5,
@@ -115,9 +95,7 @@ const clientesMock = [
     totalCompras: 960000,
     estado: 'activo',
     prioridad: 'alta',
-    comprasUltimoMes: 4,
     calificacion: 4.9,
-    etiquetas: ['corporativo', 'ingeniería', 'frecuente'],
   },
   {
     id: 6,
@@ -130,24 +108,14 @@ const clientesMock = [
     totalCompras: 320000,
     estado: 'inactivo',
     prioridad: 'media',
-    comprasUltimoMes: 0,
     calificacion: 3.8,
-    etiquetas: ['decoración', 'lujo'],
   },
 ];
 
 // Componente de tarjeta de cliente
-const ClienteCard = ({ cliente, onAction }) => {
-  const [menuAnchor, setMenuAnchor] = useState(null);
-
-  const getPrioridadColor = (prioridad) => {
-    switch(prioridad) {
-      case 'alta': return '#ef4444';
-      case 'media': return '#f59e0b';
-      case 'baja': return '#10b981';
-      default: return '#6b7280';
-    }
-  };
+const ClienteCard = ({ cliente }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const getEstadoColor = (estado) => {
     switch(estado) {
@@ -158,370 +126,187 @@ const ClienteCard = ({ cliente, onAction }) => {
     }
   };
 
-  const handleMenuOpen = (event) => {
-    event.stopPropagation();
-    setMenuAnchor(event.currentTarget);
+  const getPrioridadColor = (prioridad) => {
+    switch(prioridad) {
+      case 'alta': return '#ef4444';
+      case 'media': return '#f59e0b';
+      case 'baja': return '#10b981';
+      default: return '#6b7280';
+    }
   };
 
-  const handleMenuClose = () => {
-    setMenuAnchor(null);
-  };
-
-  const calcularDiasDesdeUltimaCompra = () => {
+  const calcularDiasDesdeCompra = () => {
     const hoy = new Date();
     const ultima = new Date(cliente.ultimaCompra);
     const diffTime = hoy - ultima;
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
-  const diasDesdeCompra = calcularDiasDesdeUltimaCompra();
+  const diasDesdeCompra = calcularDiasDesdeCompra();
 
   return (
     <Card
       elevation={0}
       sx={{
         backgroundColor: 'white',
-        borderRadius: '12px',
-        border: '1px solid #e5e7eb',
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
         height: '100%',
-        transition: 'all 0.2s',
         '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+          borderColor: '#3b82f6',
         },
       }}
     >
-      <CardContent sx={{ p: 2.5 }}>
-        {/* Header con avatar y acciones */}
-        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 2 }}>
+      <CardContent sx={{ p: 2 }}>
+        <Stack spacing={2}>
+          {/* Header */}
           <Stack direction="row" alignItems="center" spacing={1.5}>
             <Avatar sx={{ bgcolor: '#3b82f6', width: 40, height: 40 }}>
               {cliente.nombre.charAt(0)}
             </Avatar>
-            <Box>
-              <Typography variant="subtitle2" fontWeight={600} color="#111827">
-                {cliente.nombre}
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle2" fontWeight={500} color="#0f172a">
+                {isMobile && cliente.nombre.length > 25 
+                  ? `${cliente.nombre.substring(0, 25)}...` 
+                  : cliente.nombre}
               </Typography>
-              <Typography variant="caption" color="#6b7280">
+              <Typography variant="caption" color="#64748b">
                 {cliente.contacto}
               </Typography>
             </Box>
           </Stack>
-          
-          <IconButton
-            size="small"
-            onClick={handleMenuOpen}
-            sx={{ color: '#6b7280' }}
-          >
-            <MoreVert fontSize="small" />
-          </IconButton>
 
-          <Menu
-            anchorEl={menuAnchor}
-            open={Boolean(menuAnchor)}
-            onClose={handleMenuClose}
-            onClick={(e) => e.stopPropagation()}
-            PaperProps={{
-              sx: {
-                borderRadius: '12px',
-                minWidth: 160,
-                boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
-                border: '1px solid #e5e7eb',
-              }
-            }}
-          >
-            <MenuItem onClick={() => { onAction('contactar', cliente); handleMenuClose(); }}>
-              <ListItemIcon>
-                <Chat fontSize="small" />
-              </ListItemIcon>
-              Contactar
-            </MenuItem>
-            <MenuItem onClick={() => { onAction('cotizar', cliente); handleMenuClose(); }}>
-              <ListItemIcon>
-                <Receipt fontSize="small" />
-              </ListItemIcon>
-              Crear cotización
-            </MenuItem>
-            <MenuItem onClick={() => { onAction('seguimiento', cliente); handleMenuClose(); }}>
-              <ListItemIcon>
-                <Assignment fontSize="small" />
-              </ListItemIcon>
-              Agendar seguimiento
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={() => { onAction('favorito', cliente); handleMenuClose(); }}>
-              <ListItemIcon>
-                <Star fontSize="small" />
-              </ListItemIcon>
-              Marcar favorito
-            </MenuItem>
-          </Menu>
-        </Stack>
-
-        {/* Información de contacto */}
-        <Stack spacing={1} sx={{ mb: 2 }}>
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Phone sx={{ fontSize: 16, color: '#6b7280' }} />
-            <Typography variant="caption" color="#111827">
-              {cliente.telefono}
-            </Typography>
-          </Stack>
-          
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <Email sx={{ fontSize: 16, color: '#6b7280' }} />
-            <Typography variant="caption" color="#111827" sx={{ 
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
-            }}>
-              {cliente.email}
-            </Typography>
-          </Stack>
-          
-          <Stack direction="row" alignItems="center" spacing={1}>
-            <LocationOn sx={{ fontSize: 16, color: '#6b7280' }} />
-            <Typography variant="caption" color="#111827">
-              {cliente.ubicacion}
-            </Typography>
-          </Stack>
-        </Stack>
-
-        <Divider sx={{ my: 1.5 }} />
-
-        {/* Métricas rápidas */}
-        <Grid container spacing={1} sx={{ mb: 2 }}>
-          <Grid item xs={6}>
-            <Stack alignItems="center">
-              <Typography variant="caption" color="#6b7280">
-                Total Compras
+          {/* Información de contacto simplificada */}
+          <Stack spacing={1}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Phone sx={{ fontSize: 14, color: '#64748b' }} />
+              <Typography variant="caption" color="#475569">
+                {cliente.telefono}
               </Typography>
-              <Typography variant="body2" fontWeight={600} color="#111827">
+            </Stack>
+            
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Email sx={{ fontSize: 14, color: '#64748b' }} />
+              <Typography variant="caption" color="#475569" sx={{ 
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap'
+              }}>
+                {cliente.email}
+              </Typography>
+            </Stack>
+          </Stack>
+
+          {/* Estado y calificación */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Chip
+              label={cliente.estado}
+              size="small"
+              sx={{
+                backgroundColor: `${getEstadoColor(cliente.estado)}20`,
+                color: getEstadoColor(cliente.estado),
+                fontSize: '0.7rem',
+              }}
+            />
+            
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Star sx={{ fontSize: 14, color: '#f59e0b' }} />
+              <Typography variant="caption" fontWeight={500} color="#475569">
+                {cliente.calificacion}
+              </Typography>
+            </Stack>
+          </Stack>
+
+          {/* Métricas */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Box>
+              <Typography variant="caption" color="#64748b">
+                Total compras
+              </Typography>
+              <Typography variant="body2" fontWeight={600} color="#0f172a">
                 ${(cliente.totalCompras / 1000).toFixed(0)}K
               </Typography>
-            </Stack>
-          </Grid>
-          <Grid item xs={6}>
-            <Stack alignItems="center">
-              <Typography variant="caption" color="#6b7280">
-                Última Compra
+            </Box>
+            
+            <Box sx={{ textAlign: 'right' }}>
+              <Typography variant="caption" color="#64748b">
+                Última compra
               </Typography>
-              <Typography variant="body2" fontWeight={600} color={diasDesdeCompra > 30 ? '#ef4444' : '#111827'}>
+              <Typography 
+                variant="body2" 
+                fontWeight={600} 
+                sx={{ 
+                  color: diasDesdeCompra > 30 ? '#ef4444' : '#475569'
+                }}
+              >
                 {diasDesdeCompra}d
               </Typography>
-            </Stack>
-          </Grid>
-        </Grid>
-
-        {/* Estado y prioridad */}
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
-          <Stack direction="row" spacing={0.5}>
-            <Chip
-              label={cliente.estado.toUpperCase()}
-              size="small"
-              sx={{
-                backgroundColor: getEstadoColor(cliente.estado) + '20',
-                color: getEstadoColor(cliente.estado),
-                fontSize: '0.65rem',
-                height: '20px',
-              }}
-            />
-            <Chip
-              label={cliente.prioridad.toUpperCase()}
-              size="small"
-              sx={{
-                backgroundColor: getPrioridadColor(cliente.prioridad) + '20',
-                color: getPrioridadColor(cliente.prioridad),
-                fontSize: '0.65rem',
-                height: '20px',
-              }}
-            />
-          </Stack>
-
-          <Stack direction="row" alignItems="center" spacing={0.5}>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <Star
-                key={index}
-                sx={{
-                  fontSize: 14,
-                  color: index < Math.floor(cliente.calificacion) ? '#f59e0b' : '#d1d5db',
-                }}
-              />
-            ))}
+            </Box>
           </Stack>
         </Stack>
-
-        {/* Etiquetas */}
-        {cliente.etiquetas.length > 0 && (
-          <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap sx={{ mt: 1.5 }}>
-            {cliente.etiquetas.slice(0, 2).map((etiqueta, index) => (
-              <Chip
-                key={index}
-                label={etiqueta}
-                size="small"
-                sx={{
-                  fontSize: '0.65rem',
-                  height: '20px',
-                  backgroundColor: '#f3f4f6',
-                  color: '#4b5563',
-                }}
-              />
-            ))}
-            {cliente.etiquetas.length > 2 && (
-              <Chip
-                label={`+${cliente.etiquetas.length - 2}`}
-                size="small"
-                sx={{
-                  fontSize: '0.65rem',
-                  height: '20px',
-                  backgroundColor: '#e5e7eb',
-                  color: '#6b7280',
-                }}
-              />
-            )}
-          </Stack>
-        )}
       </CardContent>
     </Card>
   );
 };
 
-// Resumen de clientes
+// Resumen simplificado
 const ResumenClientes = ({ clientes }) => {
   const activos = clientes.filter(c => c.estado === 'activo').length;
-  const totalCompras = clientes.reduce((sum, c) => sum + c.totalCompras, 0);
-  const promedioCalificacion = (clientes.reduce((sum, c) => sum + c.calificacion, 0) / clientes.length).toFixed(1);
+  const total = clientes.length;
 
   return (
-    <Grid container spacing={2} sx={{ mb: 3 }}>
-      <Grid item xs={12} sm={6} md={3}>
-        <Paper
-          sx={{
-            p: 2,
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            border: '1px solid #e5e7eb',
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Box sx={{ p: 1, backgroundColor: 'rgba(16, 185, 129, 0.1)', borderRadius: '8px' }}>
-              <Person sx={{ color: '#059669' }} />
-            </Box>
-            <Box>
-              <Typography variant="caption" color="#64748b">
-                Clientes
-              </Typography>
-              <Typography variant="h5" fontWeight={700} color="#111827">
-                {clientes.length}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={3}>
-        <Paper
-          sx={{
-            p: 2,
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            border: '1px solid #e5e7eb',
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Box sx={{ p: 1, backgroundColor: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px' }}>
-              <CheckCircle sx={{ color: '#3b82f6' }} />
-            </Box>
-            <Box>
-              <Typography variant="caption" color="#64748b">
-                Activos
-              </Typography>
-              <Typography variant="h5" fontWeight={700} color="#111827">
-                {activos}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={3}>
-        <Paper
-          sx={{
-            p: 2,
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            border: '1px solid #e5e7eb',
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Box sx={{ p: 1, backgroundColor: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px' }}>
-              <Star sx={{ color: '#d97706' }} />
-            </Box>
-            <Box>
-              <Typography variant="caption" color="#64748b">
-                Calificación
-              </Typography>
-              <Typography variant="h5" fontWeight={700} color="#111827">
-                {promedioCalificacion}
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={3}>
-        <Paper
-          sx={{
-            p: 2,
-            backgroundColor: 'white',
-            borderRadius: '10px',
-            border: '1px solid #e5e7eb',
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Box sx={{ p: 1, backgroundColor: 'rgba(139, 92, 246, 0.1)', borderRadius: '8px' }}>
-              <AttachMoney sx={{ color: '#8b5cf6' }} />
-            </Box>
-            <Box>
-              <Typography variant="caption" color="#64748b">
-                Ventas Totales
-              </Typography>
-              <Typography variant="h5" fontWeight={700} color="#111827">
-                ${(totalCompras / 1000000).toFixed(1)}M
-              </Typography>
-            </Box>
-          </Stack>
-        </Paper>
-      </Grid>
-    </Grid>
+    <Paper
+      elevation={0}
+      sx={{
+        p: 2,
+        mb: 3,
+        backgroundColor: 'white',
+        borderRadius: '10px',
+        border: '1px solid #e2e8f0',
+      }}
+    >
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center" justifyContent="space-between">
+        <Box>
+          <Typography variant="body2" color="#64748b" gutterBottom>
+            Clientes registrados
+          </Typography>
+          <Typography variant="h4" fontWeight={600} color="#0f172a">
+            {total}
+          </Typography>
+        </Box>
+        
+        <Stack direction="row" spacing={3}>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" color="#10b981" fontWeight={600}>
+              {activos}
+            </Typography>
+            <Typography variant="caption" color="#64748b">
+              Activos
+            </Typography>
+          </Box>
+          
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="body2" color="#f59e0b" fontWeight={600}>
+              {total - activos}
+            </Typography>
+            <Typography variant="caption" color="#64748b">
+              Inactivos
+            </Typography>
+          </Box>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 };
 
 export default function ModuloClientes() {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const [clientes] = useState(clientesMock);
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('todos');
-
-  const handleClienteAction = (accion, cliente) => {
-    // Aquí se implementarían las acciones según el tipo
-    switch(accion) {
-      case 'contactar':
-        console.log('Contactar a:', cliente.nombre);
-        // Implementar llamada telefónica o email
-        break;
-      case 'cotizar':
-        console.log('Crear cotización para:', cliente.nombre);
-        // Navegar a módulo de cotizaciones
-        break;
-      case 'seguimiento':
-        console.log('Agendar seguimiento con:', cliente.nombre);
-        // Abrir calendario/agenda
-        break;
-      case 'favorito':
-        console.log('Marcar como favorito:', cliente.nombre);
-        // Actualizar estado del cliente
-        break;
-    }
-  };
+  const [showFilters, setShowFilters] = useState(false);
 
   const clientesFiltrados = clientes.filter(cliente => {
     if (filtroEstado !== 'todos' && cliente.estado !== filtroEstado) {
@@ -532,8 +317,7 @@ export default function ModuloClientes() {
       const searchLower = busqueda.toLowerCase();
       return (
         cliente.nombre.toLowerCase().includes(searchLower) ||
-        cliente.contacto.toLowerCase().includes(searchLower) ||
-        cliente.email.toLowerCase().includes(searchLower)
+        cliente.contacto.toLowerCase().includes(searchLower)
       );
     }
     
@@ -541,42 +325,46 @@ export default function ModuloClientes() {
   });
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f9fafb' }}>
-      <Sidebar />
-      
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        {/* Header */}
-        <Box sx={{ mb: 3 }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 3 }}>
-            <Box>
-              <Typography variant="h5" fontWeight={700} color="#1e293b" gutterBottom>
-                <Person sx={{ mr: 1.5, verticalAlign: 'middle', color: '#3b82f6' }} />
-                Mis Clientes
-              </Typography>
-              <Typography variant="body2" color="#64748b">
-                Gestión de clientes y relaciones comerciales
-              </Typography>
-            </Box>
+    <Sidebar>
+      {/* Header */}
+      <Box sx={{ mb: 3 }}>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
+          <Box>
+            <Typography variant="h5" fontWeight={600} color="#0f172a" gutterBottom>
+              <Person sx={{ 
+                mr: 1.5, 
+                verticalAlign: 'middle', 
+                color: '#3b82f6',
+                fontSize: '1.5rem'
+              }} />
+              Mis Clientes
+            </Typography>
+            <Typography variant="body2" color="#64748b">
+              Gestión de clientes asignados
+            </Typography>
+          </Box>
 
+          {!isMobile && (
             <Button
               variant="contained"
               startIcon={<Add />}
+              size="small"
               sx={{ 
                 borderRadius: '8px',
                 textTransform: 'none',
-                backgroundColor: '#4f46e5',
-                '&:hover': { backgroundColor: '#4338ca' },
               }}
             >
               Nuevo Cliente
             </Button>
-          </Stack>
+          )}
+        </Stack>
 
-          {/* Resumen */}
-          <ResumenClientes clientes={clientes} />
-        </Box>
+        {/* Resumen simplificado */}
+        <ResumenClientes clientes={clientes} />
+      </Box>
 
-        {/* Barra de búsqueda y filtros */}
+      {/* Filtros */}
+      {(showFilters || !isMobile) && (
         <Paper
           elevation={0}
           sx={{
@@ -590,14 +378,13 @@ export default function ModuloClientes() {
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
             <TextField
               fullWidth
-              placeholder="Buscar cliente por nombre, contacto o email..."
+              placeholder="Buscar cliente..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
               size="small"
               sx={{
                 '& .MuiOutlinedInput-root': {
                   borderRadius: '8px',
-                  backgroundColor: '#f8fafc',
                 },
               }}
               InputProps={{
@@ -609,74 +396,81 @@ export default function ModuloClientes() {
               }}
             />
 
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
               <Chip
-                label="TODOS"
+                label="Todos"
                 clickable
                 variant={filtroEstado === 'todos' ? 'filled' : 'outlined'}
-                color="primary"
                 onClick={() => setFiltroEstado('todos')}
-                sx={{ fontWeight: 500, borderRadius: '20px' }}
+                size="small"
               />
               <Chip
-                label="ACTIVOS"
+                label="Activos"
                 clickable
                 variant={filtroEstado === 'activo' ? 'filled' : 'outlined'}
-                color="success"
                 onClick={() => setFiltroEstado('activo')}
-                sx={{ fontWeight: 500, borderRadius: '20px' }}
+                size="small"
               />
               <Chip
-                label="INACTIVOS"
+                label="Inactivos"
                 clickable
                 variant={filtroEstado === 'inactivo' ? 'filled' : 'outlined'}
-                color="default"
                 onClick={() => setFiltroEstado('inactivo')}
-                sx={{ fontWeight: 500, borderRadius: '20px' }}
+                size="small"
               />
             </Stack>
           </Stack>
         </Paper>
+      )}
 
-        {/* Grid de clientes */}
+      {/* Clientes */}
+      <Box>
+        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+          <Typography variant="body2" color="#64748b">
+            {clientesFiltrados.length} clientes mostrados
+          </Typography>
+          
+          {isMobile && (
+            <IconButton
+              onClick={() => setShowFilters(!showFilters)}
+              sx={{
+                backgroundColor: '#f1f5f9',
+                '&:hover': { backgroundColor: '#e2e8f0' }
+              }}
+            >
+              <FilterList />
+            </IconButton>
+          )}
+        </Stack>
+        
         {clientesFiltrados.length > 0 ? (
-          <>
-            <Typography variant="subtitle2" color="#64748b" sx={{ mb: 2 }}>
-              Mostrando {clientesFiltrados.length} clientes
-              {filtroEstado !== 'todos' && ` (${filtroEstado})`}
-            </Typography>
-            
-            <Grid container spacing={2.5}>
-              {clientesFiltrados.map((cliente) => (
-                <Grid item xs={12} sm={6} md={4} key={cliente.id}>
-                  <ClienteCard 
-                    cliente={cliente} 
-                    onAction={handleClienteAction}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </>
+          <Grid container spacing={2}>
+            {clientesFiltrados.map((cliente) => (
+              <Grid item xs={12} sm={6} md={4} key={cliente.id}>
+                <ClienteCard cliente={cliente} />
+              </Grid>
+            ))}
+          </Grid>
         ) : (
           <Paper
             sx={{
-              p: 6,
+              p: 4,
               textAlign: 'center',
               backgroundColor: 'white',
               borderRadius: '10px',
               border: '1px solid #e2e8f0',
             }}
           >
-            <Person sx={{ fontSize: 48, color: '#cbd5e1', mb: 2 }} />
-            <Typography variant="h6" color="#475569" gutterBottom>
+            <Person sx={{ fontSize: 40, color: '#cbd5e1', mb: 1 }} />
+            <Typography variant="body1" color="#475569" gutterBottom>
               No se encontraron clientes
             </Typography>
             <Typography variant="body2" color="#94a3b8">
-              Intenta con otros términos de búsqueda o cambia los filtros
+              {busqueda ? 'Intenta con otros términos de búsqueda' : 'No tienes clientes asignados'}
             </Typography>
           </Paper>
         )}
       </Box>
-    </Box>
+    </Sidebar>
   );
 }
